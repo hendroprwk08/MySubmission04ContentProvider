@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
@@ -48,13 +47,13 @@ public class MovieHelper {
     }
 
     public void insertTransaction(MovieModel movieModel) {
-        String sql = "INSERT INTO " + MovieContract.TABLE_NAME + " (" +
+
+        String sql = "INSERT INTO " + MovieContract.TABLE_MOVIE + " (" +
                 MovieContract.MovieColumns.TITLE + ", " +
                 MovieContract.MovieColumns.RELEASE_DATE + ", " +
                 MovieContract.MovieColumns.OVERVIEW + ", " +
                 MovieContract.MovieColumns.POPULARITY + ", " +
-                MovieContract.MovieColumns.FAVORITE + ", " +
-                MovieContract.MovieColumns.POSTER + ") VALUES (?, ?, ?, ?, ?, ?)";
+                MovieContract.MovieColumns.POSTER + ") VALUES (?, ?, ?, ?, ?)";
 
         Log.d("Info ", movieModel.getTitle() + " " + movieModel.getFavorite());
 
@@ -63,28 +62,15 @@ public class MovieHelper {
         stmt.bindString(2, movieModel.getRelease_date());
         stmt.bindString(3, movieModel.getOverview());
         stmt.bindString(4, movieModel.getPopularity());
-        stmt.bindString(5, movieModel.getFavorite());
-        stmt.bindString(6, movieModel.getPoster());
+        stmt.bindString(5, movieModel.getPoster());
         stmt.execute();
         stmt.clearBindings();
     }
 
-    public ArrayList<MovieModel> getData(String search, Boolean favorite){
-        Cursor cursor = null;
+    public ArrayList<MovieModel> getData(){
         ArrayList<MovieModel> movieModels = new ArrayList<>();
-
-        if (search.equals("")){
-            cursor = database.rawQuery("SELECT * FROM " + MovieContract.TABLE_NAME + " ORDER BY " + MovieContract.MovieColumns._ID + " DESC", null);
-        }else if (! search.equals("")){
-            cursor = database.rawQuery("SELECT * FROM " + MovieContract.TABLE_NAME + " WHERE " + MovieContract.MovieColumns.TITLE + " LIKE '%" + search +"%' " + " ORDER BY " + MovieContract.MovieColumns._ID + " DESC", null);
-        }
-
-        if (favorite == true){
-            cursor = database.rawQuery("SELECT * FROM " + MovieContract.TABLE_NAME + " WHERE " + MovieContract.MovieColumns.FAVORITE + " = '1' ORDER BY " + MovieContract.MovieColumns._ID + " DESC", null);
-        }
-
+        Cursor cursor = database.rawQuery("SELECT * FROM " + MovieContract.TABLE_MOVIE + " ORDER BY " + MovieContract.MovieColumns._ID + " DESC", null);
         cursor.moveToFirst();
-
         MovieModel movieModel;
 
         if (cursor.getCount()>0) {
@@ -95,7 +81,6 @@ public class MovieHelper {
                 movieModel.setRelease_date(cursor.getString(cursor.getColumnIndexOrThrow(MovieContract.MovieColumns.RELEASE_DATE)));
                 movieModel.setOverview(cursor.getString(cursor.getColumnIndexOrThrow(MovieContract.MovieColumns.OVERVIEW)));
                 movieModel.setPopularity(cursor.getString(cursor.getColumnIndexOrThrow(MovieContract.MovieColumns.POPULARITY)));
-                movieModel.setFavorite(cursor.getString(cursor.getColumnIndexOrThrow(MovieContract.MovieColumns.FAVORITE)));
                 movieModel.setPoster(cursor.getString(cursor.getColumnIndexOrThrow(MovieContract.MovieColumns.POSTER)));
 
                 movieModels.add(movieModel);
@@ -109,13 +94,16 @@ public class MovieHelper {
 
     public int update(MovieModel movieModel){
         ContentValues args = new ContentValues();
-        args.put(MovieContract.MovieColumns.FAVORITE, movieModel.getFavorite());
-        return database.update(MovieContract.TABLE_NAME, args, _ID + "= '" + movieModel.getId() + "'", null);
+        return database.update(MovieContract.TABLE_MOVIE, args, _ID + "= '" + movieModel.getId() + "'", null);
+    }
+
+    public int delete(int id){
+        return database.delete(MovieContract.TABLE_MOVIE, _ID + " = '"+id+"'", null);
     }
 
     /* CONTENT PROVIDER */
     public Cursor queryProvider(){
-        return database.query(MovieContract.TABLE_NAME
+        return database.query(MovieContract.TABLE_MOVIE
                 ,null
                 ,null
                 ,null
@@ -125,7 +113,7 @@ public class MovieHelper {
     }
 
     public Cursor queryByIdProvider(String id){
-        return database.query(MovieContract.TABLE_NAME,null
+        return database.query(MovieContract.TABLE_MOVIE,null
                 ,_ID + " = ?"
                 ,new String[]{id}
                 ,null
@@ -135,14 +123,14 @@ public class MovieHelper {
     }
 
     public long insertProvider(ContentValues values){
-        return database.insert(MovieContract.TABLE_NAME,null,values);
+        return database.insert(MovieContract.TABLE_MOVIE,null,values);
     }
 
     public int updateProvider(String id,ContentValues values){
-        return database.update(MovieContract.TABLE_NAME,values,_ID +" = ?",new String[]{id} );
+        return database.update(MovieContract.TABLE_MOVIE,values,_ID +" = ?",new String[]{id} );
     }
 
     public int deleteProvider(String id){
-        return database.delete(MovieContract.TABLE_NAME,_ID + " = ?", new String[]{id});
+        return database.delete(MovieContract.TABLE_MOVIE,_ID + " = ?", new String[]{id});
     }
 }

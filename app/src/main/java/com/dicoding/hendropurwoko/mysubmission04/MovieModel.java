@@ -81,7 +81,7 @@ public class MovieModel {
         this.title = getColumnString(cursor, MovieContract.MovieColumns.TITLE);
         this.release_date = getColumnString(cursor, MovieContract.MovieColumns.RELEASE_DATE);
         this.overview = getColumnString(cursor, MovieContract.MovieColumns.OVERVIEW);
-        this.favorite = getColumnString(cursor, MovieContract.MovieColumns.FAVORITE);
+        //this.favorite = getColumnString(cursor, MovieContract.MovieColumns.FAVORITE);
         this.popularity = getColumnString(cursor, MovieContract.MovieColumns.POPULARITY);
         this.poster = getColumnString(cursor, MovieContract.MovieColumns.POSTER);
     }

@@ -5,14 +5,13 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 
 public class MovieContract {
-    static String TABLE_NAME = "table_movie";
+    static String TABLE_MOVIE = "table_movie";
 
     static final class MovieColumns implements BaseColumns {
         static String TITLE = "title";
         static String OVERVIEW = "overview";
         static String RELEASE_DATE = "release_date";
         static String POPULARITY = "popularity";
-        static String FAVORITE = "favorite";
         static String POSTER = "poster";
     }
 
@@ -21,7 +20,7 @@ public class MovieContract {
     // Base content yang digunakan untuk akses content provider
     public static final Uri CONTENT_URI = new Uri.Builder().scheme("content")
             .authority(AUTHORITY)
-            .appendPath(TABLE_NAME)
+            .appendPath(TABLE_MOVIE)
             .build();
 
     public static String getColumnString(Cursor cursor, String columnName) {

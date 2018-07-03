@@ -30,26 +30,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-
-import static com.dicoding.hendropurwoko.mysubmission04.MovieContract.CONTENT_URI;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static boolean stFavorite;
+
     NavigationView nView;
     MovieHelper movieHelper;
-    public ArrayList<MovieModel> movieAdapterList = new ArrayList<>();
+    ArrayList<MovieModel> movieModels = new ArrayList<>();
     MovieModel movieModel;
-    public static MovieAdapter movieAdapter;
+    MovieAdapter movieAdapter;
     ProgressDialog progressDialog;
     RecyclerView rvMovie;
-    int st;
-    String search;
     Menu menu;
-
     Cursor list;
+    String SEARCH, URL, API = "86b7abdb2cb37ac9c3c148021f6724e5";
 
-    AppPreference appPreference;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
@@ -75,13 +73,9 @@ public class MainActivity extends AppCompatActivity
 
         rvMovie = (RecyclerView) findViewById(R.id.recycler_view);
 
-        appPreference = new AppPreference(getApplicationContext());
-
-        if(appPreference.getFirstRun()) {
-            new LoadData().execute();
-        }
-
-        displayRecyclerView("",  false);
+        URL = "https://api.themoviedb.org/3/movie/now_playing?api_key="+ API + "&language=en-US";
+        new LoadMoviesData().execute();
+        stFavorite = false;
     }
 
     @Override
@@ -99,37 +93,8 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == 110){
-            //movieAdapter.notifyDataSetChanged();
-            displayRecyclerView("",  false);
-        }
-        //Log.d("Info:", String.valueOf(requestCode) + resultCode);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        //get shared preferences
-        sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE);
-        search = sharedPreferences.getString("search_key", "");
-        st = sharedPreferences.getInt("status_key", 0);
-
-        Log.d("Info ", st + " " + search);
-        //if (!search.equals("")){
-            //SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-            //SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-            //searchView.setIconified(false); //expand
-            //searchView.setIconified(true); //collapse
-        //}
-
-        if (st == 0) {
-            if (!search.equals("")) {
-                displayRecyclerView(search, false);
-            }else{
-                displayRecyclerView("",  false);
-            }
-        } else if (st == 1) {
-            displayRecyclerView("", true);
+            boolean Fav = Boolean.parseBoolean(data.getStringExtra("Fav"));
+            if (Fav == true) displayRecyclerView();
         }
     }
 
@@ -146,16 +111,22 @@ public class MainActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                URL = "https://api.themoviedb.org/3/search/movie?api_key=" + API + "&language=en-US&query=" + query;
+                new LoadMoviesData().execute();
+                displayJSONRecyclerView();
+                //searchList = new ArrayList<>();
+                //SearchAsync searchAsync = new SearchAsync();
+                //searchAsync.execute(URL);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //TODO: kode cari
+                /*
                 if (newText.equals("")){
-                    displayRecyclerView("",  false);
+                    //displayRecyclerView("",  false);
                 }else {
-                    displayRecyclerView(newText, false);
+                    //displayRecyclerView(newText, false);
                 }
 
                 //simpan di shared preferences
@@ -164,7 +135,7 @@ public class MainActivity extends AppCompatActivity
                 editor.putString("search_key", newText); //3
                 editor.putInt("status_key", 0); //3
                 editor.apply(); //4
-
+                */
                 return false;
             }
         });
@@ -194,25 +165,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_now_playing) {
-            st = 0;
-            displayRecyclerView("", false);
+            stFavorite = false;
+            new LoadMoviesData().execute();
+            displayJSONRecyclerView();
 
-            sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE); //1
-            editor = sharedPreferences.edit(); //2
-            editor.putInt("status_key", st); //3
-            editor.putString("search_key", ""); //3
-            //sharedPreferences.edit().remove("search_key").commit();
-            editor.apply(); //4
+            //sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE); //1
+            //editor = sharedPreferences.edit(); //2
+            //editor.putString("search_key", ""); //3
+            //editor.apply(); //4
         } else if (id == R.id.nav_favorite) {
-            st = 1;
-
-            //simpan di shared preferences
-            sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE); //1
-            editor = sharedPreferences.edit(); //2
-            editor.putInt("status_key", st); //3
-            editor.apply(); //4
-
-            displayRecyclerView("", true);
+            stFavorite = true;
+            displayRecyclerView();
         } else if (id == R.id.nav_share) {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
@@ -222,18 +185,12 @@ public class MainActivity extends AppCompatActivity
             startActivity(Intent.createChooser(intent, getResources().getString(R.string.share)));
         }
 
-        //simpan status orientation
-        sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE); //1
-        editor = sharedPreferences.edit(); //2
-        editor.putInt("status_key", st); //3
-        editor.commit(); //4
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    private class LoadData extends AsyncTask<Void, Void, Cursor> {
+    private class LoadFavoriteMovies extends AsyncTask<Void, Void, ArrayList<MovieModel>> {
 
         @Override
         protected void onPreExecute() {
@@ -246,84 +203,110 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        protected void onPostExecute(Cursor aVoid) {
+        protected void onPostExecute(ArrayList<MovieModel> aVoid) {
             super.onPostExecute(aVoid);
 
             if (progressDialog.isShowing())
                 progressDialog.dismiss();
 
-            displayRecyclerView("",  false);
+            //displayRecyclerView();
         }
 
         @Override
-        protected Cursor doInBackground(Void... voids) {
-            appPreference.setFirstRun(false);
-            return getContentResolver().query(CONTENT_URI, null, null, null, null);
+        protected ArrayList<MovieModel> doInBackground(Void... voids) {
+            movieHelper = new MovieHelper(getApplicationContext());
+            movieHelper.open();
+            movieModels = movieHelper.getData();
+            movieHelper.close();
+            return movieModels;
         }
     }
 
-    private ArrayList<MovieModel> loadJSON() {
-        String API = "86b7abdb2cb37ac9c3c148021f6724e5";
-        String URL = "https://api.themoviedb.org/3/movie/upcoming?api_key="+ API + "&language=en-US";
+    public void displayRecyclerView() {
+        movieModels = new ArrayList<>();
 
-        final ArrayList<MovieModel> movieModels = new ArrayList();
-        SyncHttpClient client = new SyncHttpClient();
-
-        client.get(URL, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                String result = new String(responseBody);
-                try {
-                    JSONObject jsonObj = new JSONObject(result);
-                    JSONArray jsonArray = jsonObj.getJSONArray("results");
-
-                    for (int i = 0; i < jsonArray.length() ; i++) {
-                        JSONObject data = jsonArray.getJSONObject(i);
-                        movieModel = new MovieModel();
-
-                        movieModel.setTitle(data.getString("title").toString().trim());
-                        movieModel.setOverview(data.getString("overview").toString().trim());
-                        movieModel.setRelease_date(data.getString("release_date").toString().trim());
-                        movieModel.setPopularity(data.getString("popularity").toString().trim());
-                        movieModel.setFavorite("0");
-                        movieModel.setPoster("http://image.tmdb.org/t/p/w185"+data.getString("poster_path").toString().trim());
-
-                        movieModels.add(movieModel);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-                Log.d("ERROR: ", statusCode +": "+ error.toString());
-            }
-        });
-
-        return movieModels;
-    }
-
-    public void displayRecyclerView(String search, Boolean favorite) {
         movieAdapter = new MovieAdapter(getApplicationContext());
-        movieHelper = new MovieHelper(getApplicationContext());
         rvMovie.setLayoutManager(new LinearLayoutManager(this));
 
-        movieHelper.open();
-
-        if (search.equals("") && favorite == false){
-            movieAdapterList = movieHelper.getData("", false);
-        }else if(!search.equals("") && favorite == false){
-            movieAdapterList = movieHelper.getData(search, false);
-        }else if(search.equals("") && favorite == true) {
-            movieAdapterList = movieHelper.getData("", true);
+        //ambil nilai dari async
+        try {
+            movieModels = new LoadFavoriteMovies().execute().get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
         }
 
-        //if (movieAdapterList.size() == 0) Toast.makeText(getApplicationContext(), "Tak Ada Data", Toast.LENGTH_SHORT).show();
+        movieAdapter.addItem(movieModels);
+        rvMovie.setAdapter(movieAdapter);
+    }
 
-        movieHelper.close();
-        movieAdapter.addItem(movieAdapterList);
+    /* LOAD JSON */
+    private class LoadMoviesData extends AsyncTask<Void, Void, ArrayList<MovieModel>> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<MovieModel> aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+
+            displayJSONRecyclerView();
+        }
+
+        @Override
+        protected ArrayList<MovieModel> doInBackground(Void... voids) {
+            movieModels = new ArrayList();
+            SyncHttpClient client = new SyncHttpClient();
+
+            client.get(URL, new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+                    String result = new String(responseBody);
+                    try {
+                        JSONObject jsonObj = new JSONObject(result);
+                        JSONArray jsonArray = jsonObj.getJSONArray("results");
+
+                        for (int i = 0; i < jsonArray.length() ; i++) {
+                            JSONObject data = jsonArray.getJSONObject(i);
+                            movieModel = new MovieModel();
+
+                            movieModel.setTitle(data.getString("title").toString().trim());
+                            movieModel.setOverview(data.getString("overview").toString().trim());
+                            movieModel.setRelease_date(data.getString("release_date").toString().trim());
+                            movieModel.setPopularity(data.getString("popularity").toString().trim());
+                            movieModel.setPoster("http://image.tmdb.org/t/p/w185"+data.getString("poster_path").toString().trim());
+
+                            movieModels.add(movieModel);
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.d("ERROR: ", statusCode +": "+ error.toString());
+                }
+            });
+            return movieModels;
+        }
+    }
+
+    private void displayJSONRecyclerView() {
+        movieAdapter = new MovieAdapter(getApplicationContext());
+        rvMovie.setLayoutManager(new LinearLayoutManager(this));
+        movieAdapter.addItem(movieModels);
         rvMovie.setAdapter(movieAdapter);
     }
 }

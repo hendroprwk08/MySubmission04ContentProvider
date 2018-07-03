@@ -7,29 +7,32 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+
+import static com.dicoding.hendropurwoko.mysubmission04.MainActivity.*;
 
 public class DetailActivity extends AppCompatActivity {
     TextView tvTitle, tvOverview, tvReleaseDate, tvPopularity;
     ImageView ivPoster;
     ImageButton ibFavorite;
     Bundle bundle;
-    String id, title, overview, releaseDate, popularity, favorite, poster;
+    String id, title, overview, releaseDate, popularity, favorite, poster, stFavorite;
     public static int RESULT_CODE = 110;
-    MovieModel movieModel;
+    Context c;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        Context c = getApplicationContext();
+        c = getApplicationContext();
 
         tvTitle = (TextView)findViewById(R.id.tv_title_detail);
         tvOverview = (TextView)findViewById(R.id.tv_overview_detail);
@@ -42,68 +45,67 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                movieModel = new MovieModel();
                 MovieHelper movieHelper = new MovieHelper(getApplicationContext());
+                movieHelper.open();
 
-                if (favorite.equals("1")){
-                    favorite = "0";
-
-                    movieHelper.open();
-                    movieModel.setId(Integer.parseInt(id.toString()));
-                    movieModel.setFavorite(favorite);
-                    movieHelper.update(movieModel);
-                    movieHelper.close();
-
-                    ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
-                }else{
-                    favorite = "1";
-
-                    movieHelper.open();
-                    movieModel.setId(Integer.parseInt(id.toString()));
-                    movieModel.setFavorite(favorite);
-                    movieHelper.update(movieModel);
-                    movieHelper.close();
-
+                if (favorite.equals("false")){
                     ibFavorite.setImageResource(R.drawable.ic_favorite_black);
+
+                    movieModel = new MovieModel();
+                    movieModel.setTitle(title);
+                    movieModel.setRelease_date(releaseDate);
+                    movieModel.setOverview(overview);
+                    movieModel.setPopularity(popularity);
+                    movieModel.setPoster(poster);
+
+                    movieHelper.beginTransaction();
+                    movieHelper.insertTransaction(movieModel);
+                    movieHelper.setTransactionSuccess();
+                    movieHelper.endTransaction();
+
+                    Toast.makeText(getApplicationContext(),"Favorite: "+ title, Toast.LENGTH_SHORT ).show();
+                }else{
+                    ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
+                    movieHelper.delete(Integer.parseInt(id));
+                    Toast.makeText(getApplicationContext(),"Dihapus: "+ title, Toast.LENGTH_SHORT ).show();
                 }
 
+                movieHelper.close();
+
                 Intent i = new Intent();
+                i.putExtra("Fav", String.valueOf(MainActivity.stFavorite));
                 setResult(RESULT_CODE, i);
                 finish();
             }
         });
 
-        /* CONTENT PROVIDER */
-        Uri uri = getIntent().getData();
+        bundle = new Bundle();
+        bundle = getIntent().getExtras();
 
-        if (uri != null) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        id = bundle.getString("id").toString();
+        title = bundle.getString("title").toString();
+        overview = bundle.getString("overview").toString();
+        releaseDate = bundle.getString("release_date").toString();
+        popularity = bundle.getString("popularity").toString();
+        poster = bundle.getString("poster").toString();
+        favorite = bundle.getString("favorite").toString();
 
-            if (cursor != null){
-                if(cursor.moveToFirst()) movieModel = new MovieModel(cursor);
-                cursor.close();
-            }
-        }
-        /* ------------------------------- */
+        Log.d("Favorite: ", favorite);
 
-        if (movieModel != null){
-            tvTitle.setText(movieModel.getTitle());
-            tvOverview.setText(movieModel.getOverview());
-            tvReleaseDate.setText(movieModel.getRelease_date());
-            tvPopularity.setText("RATE: "+ movieModel.getPopularity());
+        tvTitle.setText(title);
+        tvOverview.setText(overview);
+        tvReleaseDate.setText("RELEASE: "+releaseDate);
+        tvPopularity.setText("RATE: "+popularity);
 
-            Glide.with(c)
-                    .load(movieModel.getPoster())
-                    .override(350, 350)
-                    .into(ivPoster);
+        Glide.with(c)
+                .load(poster)
+                .override(350, 350)
+                .into(ivPoster);
 
-            favorite = movieModel.getFavorite();
-
-            if (favorite.equals("0")){
-                ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
-            }else{
-                ibFavorite.setImageResource(R.drawable.ic_favorite_black);
-            }
+        if (favorite.equals("false")){
+            ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
+        }else{
+           ibFavorite.setImageResource(R.drawable.ic_favorite_black);
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //back arrow

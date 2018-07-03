@@ -6,7 +6,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import static com.dicoding.hendropurwoko.mysubmission04.MovieContract.AUTHORITY;
 import static com.dicoding.hendropurwoko.mysubmission04.MovieContract.CONTENT_URI;
@@ -24,11 +23,11 @@ public class MovieProvider extends ContentProvider{
     static {
 
         // content://com.dicoding.mynotesapp/note
-        sUriMatcher.addURI(AUTHORITY, MovieContract.TABLE_NAME, 1);
+        sUriMatcher.addURI(AUTHORITY, MovieContract.TABLE_MOVIE, 1);
 
         // content://com.dicoding.mynotesapp/note/id
         sUriMatcher.addURI(AUTHORITY,
-                MovieContract.TABLE_NAME+ "/#",
+                MovieContract.TABLE_MOVIE + "/#",
                 NOTE_ID);
     }
 
