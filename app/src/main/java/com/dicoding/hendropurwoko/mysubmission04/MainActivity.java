@@ -46,10 +46,7 @@ public class MainActivity extends AppCompatActivity
     RecyclerView rvMovie;
     Menu menu;
     Cursor list;
-    String SEARCH, URL, API = "86b7abdb2cb37ac9c3c148021f6724e5";
-
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    String URL, API = "86b7abdb2cb37ac9c3c148021f6724e5";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,28 +111,11 @@ public class MainActivity extends AppCompatActivity
                 URL = "https://api.themoviedb.org/3/search/movie?api_key=" + API + "&language=en-US&query=" + query;
                 new LoadMoviesData().execute();
                 displayJSONRecyclerView();
-                //searchList = new ArrayList<>();
-                //SearchAsync searchAsync = new SearchAsync();
-                //searchAsync.execute(URL);
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                /*
-                if (newText.equals("")){
-                    //displayRecyclerView("",  false);
-                }else {
-                    //displayRecyclerView(newText, false);
-                }
-
-                //simpan di shared preferences
-                sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE); //1
-                editor = sharedPreferences.edit(); //2
-                editor.putString("search_key", newText); //3
-                editor.putInt("status_key", 0); //3
-                editor.apply(); //4
-                */
                 return false;
             }
         });

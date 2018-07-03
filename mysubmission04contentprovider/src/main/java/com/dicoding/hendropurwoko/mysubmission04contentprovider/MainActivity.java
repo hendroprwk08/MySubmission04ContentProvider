@@ -9,14 +9,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import java.util.ArrayList;
-
 import static com.dicoding.hendropurwoko.mysubmission04contentprovider.MovieContractContentProvider.MovieColumnsContentProvider.CONTENT_URI;
 
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView rvMovieContentProvider;
     MovieAdapterContentProvider movieAdapter;
+
     private Cursor list;
 
     @Override
@@ -25,8 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         rvMovieContentProvider = (RecyclerView) findViewById(R.id.recycler_view_content_provider);
-        setupList();
-        new loadDataAsync().execute();
+        new LoadDataContentProvider().execute();
     }
 
     private void setupList() {
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         rvMovieContentProvider.setAdapter(movieAdapter);
     }
 
-    private class loadDataAsync extends AsyncTask<Void, Void, Cursor> {
+    private class LoadDataContentProvider extends AsyncTask<Void, Void, Cursor> {
 
         @Override
         protected Cursor doInBackground(Void... voids) {
