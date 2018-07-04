@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity
         //defauit check navigation
         nView = (NavigationView) findViewById(R.id.nav_view);
         nView.getMenu().getItem(0).setChecked(true);
+        getSupportActionBar().setSubtitle("Home");
 
         rvMovie = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -98,8 +99,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.menu = menu;
-
-        // Inflate the menu; this adds items to the action bar if it is present.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 
@@ -108,6 +107,9 @@ public class MainActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                nView.getMenu().getItem(0).setChecked(true);
+                stFavorite = false;
+
                 URL = "https://api.themoviedb.org/3/search/movie?api_key=" + API + "&language=en-US&query=" + query;
                 new LoadMoviesData().execute();
                 displayJSONRecyclerView();
@@ -135,6 +137,10 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        if (id == R.id.action_content_provider){
+            startActivity(new Intent(MainActivity.this, TestCPActivity.class));
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -146,6 +152,9 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_now_playing) {
             stFavorite = false;
+            getSupportActionBar().setSubtitle("Home");
+
+            URL = "https://api.themoviedb.org/3/movie/now_playing?api_key="+ API + "&language=en-US";
             new LoadMoviesData().execute();
             displayJSONRecyclerView();
 
@@ -154,6 +163,7 @@ public class MainActivity extends AppCompatActivity
             //editor.putString("search_key", ""); //3
             //editor.apply(); //4
         } else if (id == R.id.nav_favorite) {
+            getSupportActionBar().setSubtitle("Favorite");
             stFavorite = true;
             displayRecyclerView();
         } else if (id == R.id.nav_share) {
@@ -247,6 +257,8 @@ public class MainActivity extends AppCompatActivity
         protected ArrayList<MovieModel> doInBackground(Void... voids) {
             movieModels = new ArrayList();
             SyncHttpClient client = new SyncHttpClient();
+
+            Log.d("Info ", URL);
 
             client.get(URL, new AsyncHttpResponseHandler() {
                 @Override

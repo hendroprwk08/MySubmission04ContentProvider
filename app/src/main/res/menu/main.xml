@@ -10,8 +10,7 @@
 
     <item
         android:id="@+id/action_content_provider"
-        android:title="@string/action_search"
-        android:icon="@drawable/ic_search"
-        app:showAsAction="always"
-        app:actionViewClass="android.widget.SearchView" />
+        android:title="@string/action_content_provider"
+        android:icon="@drawable/ic_announcement"
+        app:showAsAction="always"/>
 </menu>

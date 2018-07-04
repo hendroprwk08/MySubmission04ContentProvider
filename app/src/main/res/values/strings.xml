@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">MySubmission04ContentProvider</string>
+    <string name="app_name">MySubmission04</string>
     <string name="please_wait">Mohon Tunggu</string>
     <string name="app_first_run">first_run</string>
-    <string name="title_activity_main">MySubmission04ContentProvider</string>
+    <string name="title_activity_main">MySubmission04</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Hendro Purwoko</string>
@@ -13,4 +13,5 @@
     <string name="detail">Detail</string>
     <string name="share">Share</string>
     <string name="share_description">Download besok! Hari ini lagi mager</string>
+    <string name="action_content_provider">Content Provider</string>
 </resources>

@@ -63,7 +63,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.tvTitle.setText(movieModels.get(position).getTitle());
         holder.tvOverview.setText(movieModels.get(position).getOverview());
         holder.tvReleaseDate.setText(movieModels.get(position).getRelease_date());
-        holder.tvFavorite.setText(String.valueOf(MainActivity.stFavorite));
+        //holder.tvFavorite.setText(String.valueOf(MainActivity.stFavorite));
 
         Glide.with(c)
                 .load(movieModels.get(position).getPoster())

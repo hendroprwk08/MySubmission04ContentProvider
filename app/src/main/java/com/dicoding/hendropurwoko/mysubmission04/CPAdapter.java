@@ -1,4 +1,4 @@
-package com.dicoding.hendropurwoko.mysubmission04contentprovider;
+package com.dicoding.hendropurwoko.mysubmission04;
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,40 +18,61 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-public class MovieAdapterContentProvider extends RecyclerView.Adapter<MovieAdapterContentProvider.ViewHolder> {
-    private int REQUEST_CODE = 100;
+public class CPAdapter extends RecyclerView.Adapter<CPAdapter.ViewHolder> {
     Context context;
-    private Cursor list;
 
-    ArrayList<MovieModelContentProvider> movieModels = new ArrayList<>();
+    private int REQUEST_CODE = 100;
+    ArrayList<MovieModel> movieModels = new ArrayList<>();
     Context c ;
 
-    public MovieAdapterContentProvider(Context c) {this.c = c; }
+    private Cursor list;
+
+    public CPAdapter(Context c) {this.c = c; }
+
+    public void setList(Cursor list) {
+        this.list = list;
+    }
 
     @Override
-    public MovieAdapterContentProvider.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CPAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.movies_layout, parent, false);
         return new ViewHolder(view);
     }
 
+    private MovieModel getItem(int position){
+        if (!list.moveToPosition(position)) {
+            throw new IllegalStateException("Position invalid");
+        }
+        return new MovieModel(list);
+    }
+
     @Override
-    public void onBindViewHolder(MovieAdapterContentProvider.ViewHolder holder, final int position) {
+    public void onBindViewHolder(CPAdapter.ViewHolder holder, final int position) {
         /*
         Log.d ("Info ", movieModels.get(position).getTitle() + " " +
                 movieModels.get(position).getRelease_date()+ " " +
                 movieModels.get(position).getOverview()+ " " +
                 movieModels.get(position).getPopularity()+ " " +
                 movieModels.get(position).getPoster());
-         */
+        */
 
-        holder.tvTitle.setText(movieModels.get(position).getTitle());
-        holder.tvOverview.setText(movieModels.get(position).getOverview());
-        holder.tvReleaseDate.setText(movieModels.get(position).getRelease_date());
-        holder.tvFavorite.setText(movieModels.get(position).getFavorite());
+        final MovieModel movieModel = getItem(position);
+
+        Log.d ("Info ", movieModel.getTitle() + " " +
+                movieModel.getRelease_date()+ " " +
+                movieModel.getOverview()+ " " +
+                movieModel.getPopularity()+ " " +
+                movieModel.getPoster());
+
+
+        holder.tvTitle.setText(movieModel.getTitle());
+        holder.tvOverview.setText(movieModel.getOverview());
+        holder.tvReleaseDate.setText(movieModel.getRelease_date());
+        //holder.tvFavorite.setText(String.valueOf(MainActivity.stFavorite));
 
         Glide.with(c)
-                .load(movieModels.get(position).getPoster())
+                .load(movieModel.getPoster())
                 .override(350, 350)
                 .into(holder.ivPoster);
 
@@ -58,19 +80,16 @@ public class MovieAdapterContentProvider extends RecyclerView.Adapter<MovieAdapt
             @Override
             public void onClick(View v) {
                 Bundle bundle = new Bundle();
-                Intent detailIntent = new Intent(v.getContext(), DetailActivity.class);
-                bundle.putString("id", String.valueOf(movieModels.get(position).getId()));
-                bundle.putString("title", movieModels.get(position).getTitle().toString().trim());
-                bundle.putString("overview", movieModels.get(position).getOverview().toString().trim());
-                bundle.putString("release_date", movieModels.get(position).getRelease_date().toString().trim());
-                bundle.putString("popularity", movieModels.get(position).getPopularity().toString().trim());
-                bundle.putString("poster", movieModels.get(position).getPoster().toString().trim());
-                bundle.putString("favorite", movieModels.get(position).getFavorite().toString().trim());
+                bundle.putString("id", String.valueOf(movieModel.getId()));
+                bundle.putString("title", movieModel.getTitle().toString().trim());
+                bundle.putString("overview", movieModel.getOverview().toString().trim());
+                bundle.putString("release_date", movieModel.getRelease_date().toString().trim());
+                bundle.putString("popularity", movieModel.getPopularity().toString().trim());
+                bundle.putString("poster", movieModel.getPoster().toString().trim());
+                bundle.putString("favorite", String.valueOf(MainActivity.stFavorite));
 
-                //Log.d("Info ", movieModels.get(position).getFavorite().toString().trim());
+                Intent detailIntent = new Intent(v.getContext(), DetailActivity.class);
                 detailIntent.putExtras(bundle);
-                //v.getContext().startActivity(detailIntent);
-                //v.getContext().startActivityForResult(detailIntent, REQUEST_CODE);
                 ((Activity) context).startActivityForResult(detailIntent, REQUEST_CODE);
             }
         });
@@ -88,12 +107,17 @@ public class MovieAdapterContentProvider extends RecyclerView.Adapter<MovieAdapt
         });
     }
 
-    public void addItem(ArrayList<MovieModelContentProvider> movieList) {
+    public void addItem(ArrayList<MovieModel> movieList) {
         this.movieModels = movieList;
         notifyDataSetChanged();
     }
+
+    public ArrayList<MovieModel> getListItems() {
+        return this.movieModels;
+    }
+
     public int getItemCount() {
-        return movieModels.size();
+        return list.getCount();
     }
 
     public void replaceAll(Cursor items) {
@@ -115,7 +139,6 @@ public class MovieAdapterContentProvider extends RecyclerView.Adapter<MovieAdapt
             btDetail = (Button)itemView.findViewById(R.id.bt_detail_now_playing);
             btShare = (Button)itemView.findViewById(R.id.bt_share_now_playing);
             tvFavorite = (TextView) itemView.findViewById(R.id.tv_favorite);
-
         }
     }
 }
