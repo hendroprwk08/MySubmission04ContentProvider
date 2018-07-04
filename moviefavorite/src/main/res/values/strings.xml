@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MovieFavorite</string>
+    <string name="please_wait">Mohon Tunggu</string>
+    <string name="detail">Detail</string>
+    <string name="share">Share</string>
+</resources>
