@@ -6,7 +6,7 @@
 
     <permission
         android:name="com.dicoding.hendropurwoko.mysubmission04.READ_DATABASE"
-        android:protectionLevel="normal" />
+        />
     <permission
         android:name="com.dicoding.hendropurwoko.mysubmission04.WRITE_DATABASE"
         android:protectionLevel="normal" />

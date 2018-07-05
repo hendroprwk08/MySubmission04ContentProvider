@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.MovieColumns.OVERVIEW;
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.MovieColumns.POPULARITY;
+import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.MovieColumns.POSTER;
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.MovieColumns.RELEASE_DATE;
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.MovieColumns.TITLE;
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.getColumnString;
@@ -58,6 +59,11 @@ public class CPAdapter extends CursorAdapter{
             tvTitle.setText(getColumnString(cursor,TITLE));
             tvOverview.setText(getColumnString(cursor,OVERVIEW));
             tvReleaseDate.setText(getColumnString(cursor,RELEASE_DATE));
+
+            Glide.with(context)
+                    .load(getColumnString(cursor,TITLE))
+                    .override(350, 350)
+                    .into(ivPoster);
         }
     }
 }

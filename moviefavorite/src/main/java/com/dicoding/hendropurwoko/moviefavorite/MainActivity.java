@@ -2,9 +2,14 @@ package com.dicoding.hendropurwoko.moviefavorite;
 
 import android.app.LoaderManager;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
+import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,17 +18,13 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.CONTENT_URI;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnClickListener{
-    ProgressDialog progressDialog;
-    Menu menu;
-    public static boolean stFavorite;
-
-    private Cursor list;
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener, View.OnClickListener {
     private CPAdapter cpAdapter;
     RecyclerView rvCP;
 
@@ -34,75 +35,51 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        rvCP = (RecyclerView)findViewById(R.id.recycler_view_cp);
-        getSupportActionBar().setSubtitle("Content Provider");
+        getSupportActionBar().setTitle("Dicoding Notes");
 
-        stFavorite = true;
+        rvCP = (RecyclerView) findViewById(R.id.recycler_view_cp);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //back arrow
-        new LoadDataContentProvider().execute();
+        cpAdapter = new CPAdapter(this, null, true);
+        rvCP.setLayoutManager(new LinearLayoutManager(this));
+        rvCP.setAdapter(cpAdapter); //<---------- error
+        rvCP.setOnClickListener(this);
+
+        getSupportLoaderManager().initLoader(LOAD_NOTES_ID, null, this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getSupportLoaderManager().restartLoader(LOAD_NOTES_ID, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        return new CursorLoader(this, CONTENT_URI, null, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        cpAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        cpAdapter.swapCursor(null);
+    }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Cursor cursor = (Cursor) cpAdapter.getItem(position);
+
+        id = cursor.getInt(cursor.getColumnIndexOrThrow(MovieContract.MovieColumns._ID));
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.setData(Uri.parse(CONTENT_URI+"/"+id));
+        startActivity(intent);
     }
 
     @Override
     public void onClick(View v) {
 
     }
-
-    private class LoadDataContentProvider extends AsyncTask<Void, Void, Cursor> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            progressDialog = new ProgressDialog(MainActivity.this);
-            progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
-            progressDialog.setCancelable(true);
-            progressDialog.show();
-        }
-
-        @Override
-        protected void onPostExecute(Cursor aVoid) {
-            super.onPostExecute(aVoid);
-
-            if (progressDialog.isShowing())
-                progressDialog.dismiss();
-            }
-
-        @Override
-        protected Cursor doInBackground(Void... voids) {
-            list = getContentResolver().query(
-                    CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-
-            return list;
-        }
-    }
-
-    private void display(){
-        //Log.d("Info ", String.valueOf(list.getCount()));
-
-        //cpAdapter = new CPAdapter(getApplicationContext());
-        //rvCP.setLayoutManager(new LinearLayoutManager(this));
-        //cpAdapter.replaceAll(list);
-        //rvCP.setAdapter(cpAdapter);
-    }
-
 }
