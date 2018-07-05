@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.dicoding.hendropurwoko.moviefavorite">
 
-    <permission
+    <uses-permission
         android:name="com.dicoding.hendropurwoko.mysubmission04.READ_DATABASE"/>
-    <permission
+    <uses-permission
         android:name="com.dicoding.hendropurwoko.mysubmission04.WRITE_DATABASE"/>
 
     <application
