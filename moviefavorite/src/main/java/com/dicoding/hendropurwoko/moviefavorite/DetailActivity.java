@@ -68,7 +68,7 @@ public class DetailActivity extends AppCompatActivity {
                 movieHelper.close();
 
                 Intent i = new Intent();
-                i.putExtra("Fav", String.valueOf(MainActivity.stFavorite));
+                //i.putExtra("Fav", String.valueOf(MainActivity.stFavorite));
                 setResult(RESULT_CODE, i);
                 finish();
             }

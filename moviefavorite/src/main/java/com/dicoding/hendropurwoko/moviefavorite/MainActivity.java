@@ -41,16 +41,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         cpAdapter = new CPAdapter(this, null, true);
         rvCP.setLayoutManager(new LinearLayoutManager(this));
-        rvCP.setAdapter(cpAdapter); //<---------- error
+        //rvCP.setAdapter(cpAdapter); //<---------- error
         rvCP.setOnClickListener(this);
 
-        getSupportLoaderManager().initLoader(LOAD_NOTES_ID, null, this);
+        getSupportLoaderManager().initLoader(LOAD_NOTES_ID, null, (android.support.v4.app.LoaderManager.LoaderCallbacks<Object>) this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        getSupportLoaderManager().restartLoader(LOAD_NOTES_ID, null, this);
+        getSupportLoaderManager().restartLoader(LOAD_NOTES_ID, null, (android.support.v4.app.LoaderManager.LoaderCallbacks<Object>) this);
     }
 
     @Override
