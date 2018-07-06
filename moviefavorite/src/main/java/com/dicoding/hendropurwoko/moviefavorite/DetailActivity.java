@@ -73,11 +73,6 @@ public class DetailActivity extends AppCompatActivity {
                 .placeholder(R.drawable.logo_android_rectangle )
                 .into(ivPoster);
 
-        //manual
-        //new DownloadImageTask((ImageView) findViewById(R.id.iv_poster_now_playing))
-        //        .execute(poster);
-
-
         if (favorite.equals("false")){
             ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
         }else{

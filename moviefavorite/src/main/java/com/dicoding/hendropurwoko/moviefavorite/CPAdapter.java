@@ -70,13 +70,6 @@ public class CPAdapter extends RecyclerView.Adapter<CPAdapter.ViewHolder> {
                 .signature(new StringSignature("content"))
                 .into(holder.ivPoster);
 
-        //Glide.with(yourFragment)
-        //        .load(yourFileDataModel)
-
-        //        .into(yourImageView);
-
-        //new DownloadImageTask(holder.ivPoster).execute(movieModel.getPoster());
-
         holder.btDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
