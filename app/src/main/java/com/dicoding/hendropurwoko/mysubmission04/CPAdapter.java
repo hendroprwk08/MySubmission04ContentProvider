@@ -55,15 +55,17 @@ public class CPAdapter extends RecyclerView.Adapter<CPAdapter.ViewHolder> {
                 movieModels.get(position).getOverview()+ " " +
                 movieModels.get(position).getPopularity()+ " " +
                 movieModels.get(position).getPoster());
-        */
 
-        final MovieModel movieModel = getItem(position);
-
-        Log.d ("Info ", movieModel.getTitle() + " " +
+         Log.d ("Info ", movieModel.getTitle() + " " +
                 movieModel.getRelease_date()+ " " +
                 movieModel.getOverview()+ " " +
                 movieModel.getPopularity()+ " " +
                 movieModel.getPoster());
+        */
+
+        final MovieModel movieModel = getItem(position);
+
+
 
 
         holder.tvTitle.setText(movieModel.getTitle());

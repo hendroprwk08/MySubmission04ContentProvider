@@ -24,29 +24,70 @@ import java.util.ArrayList;
 
 import static com.dicoding.hendropurwoko.moviefavorite.MovieContract.CONTENT_URI;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>, AdapterView.OnItemClickListener, View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
     private CPAdapter cpAdapter;
+    ProgressDialog progressDialog;
     RecyclerView rvCP;
 
     private final int LOAD_NOTES_ID = 110;
+    private Cursor list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportActionBar().setTitle("Dicoding Notes");
+        getSupportActionBar().setTitle("Favorite Movies");
+        getSupportActionBar().setSubtitle("Content Provider");
 
         rvCP = (RecyclerView) findViewById(R.id.recycler_view_cp);
 
-        cpAdapter = new CPAdapter(this, null, true);
-        rvCP.setLayoutManager(new LinearLayoutManager(this));
-        //rvCP.setAdapter(cpAdapter); //<---------- error
-        rvCP.setOnClickListener(this);
-
-        getSupportLoaderManager().initLoader(LOAD_NOTES_ID, null, (android.support.v4.app.LoaderManager.LoaderCallbacks<Object>) this);
+        new LoadDataContentProvider().execute();
     }
 
+    private class LoadDataContentProvider extends AsyncTask<Void, Void, Cursor> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Cursor aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+
+            display();
+        }
+
+        @Override
+        protected Cursor doInBackground(Void... voids) {
+            list = getContentResolver().query(
+                    CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            return list;
+        }
+    }
+
+    private void display(){
+        cpAdapter = new CPAdapter(MainActivity.this);
+        rvCP.setLayoutManager(new LinearLayoutManager(this));
+        rvCP.setAdapter(cpAdapter);
+        cpAdapter.setList(list);
+        rvCP.setAdapter(cpAdapter);
+    }
+    /*
     @Override
     protected void onResume() {
         super.onResume();
@@ -82,4 +123,39 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onClick(View v) {
 
     }
+     private class LoadDataContentProvider extends AsyncTask<Void, Void, Cursor> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+            progressDialog = new ProgressDialog(TestCPActivity.this);
+            progressDialog.setMessage(getString(R.string.please_wait));//ambil resource string
+            progressDialog.setCancelable(true);
+            progressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(Cursor aVoid) {
+            super.onPostExecute(aVoid);
+
+            if (progressDialog.isShowing())
+                progressDialog.dismiss();
+
+            display();
+        }
+
+        @Override
+        protected Cursor doInBackground(Void... voids) {
+            list = getContentResolver().query(
+                    CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            return list;
+        }
+    }
+    */
 }

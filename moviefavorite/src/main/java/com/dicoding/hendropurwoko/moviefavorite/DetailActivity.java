@@ -2,6 +2,9 @@ package com.dicoding.hendropurwoko.moviefavorite;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+
+import java.io.InputStream;
 
 public class DetailActivity extends AppCompatActivity {
     TextView tvTitle, tvOverview, tvReleaseDate, tvPopularity;
@@ -40,37 +45,7 @@ public class DetailActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                MovieHelper movieHelper = new MovieHelper(getApplicationContext());
-                movieHelper.open();
-
-                if (favorite.equals("false")){
-                    ibFavorite.setImageResource(R.drawable.ic_favorite_black);
-
-                    movieModel = new MovieModel();
-                    movieModel.setTitle(title);
-                    movieModel.setRelease_date(releaseDate);
-                    movieModel.setOverview(overview);
-                    movieModel.setPopularity(popularity);
-                    movieModel.setPoster(poster);
-
-                    movieHelper.beginTransaction();
-                    movieHelper.insertTransaction(movieModel);
-                    movieHelper.setTransactionSuccess();
-                    movieHelper.endTransaction();
-
-                    Toast.makeText(getApplicationContext(),"Favorite: "+ title, Toast.LENGTH_SHORT ).show();
-                }else{
-                    ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
-                    movieHelper.delete(Integer.parseInt(id));
-                    Toast.makeText(getApplicationContext(),"Dihapus: "+ title, Toast.LENGTH_SHORT ).show();
-                }
-
-                movieHelper.close();
-
-                Intent i = new Intent();
-                //i.putExtra("Fav", String.valueOf(MainActivity.stFavorite));
-                setResult(RESULT_CODE, i);
-                finish();
+               Toast.makeText(getApplicationContext(), "Favorite: " + title, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -95,7 +70,13 @@ public class DetailActivity extends AppCompatActivity {
         Glide.with(c)
                 .load(poster)
                 .override(350, 350)
+                .placeholder(R.drawable.logo_android_rectangle )
                 .into(ivPoster);
+
+        //manual
+        //new DownloadImageTask((ImageView) findViewById(R.id.iv_poster_now_playing))
+        //        .execute(poster);
+
 
         if (favorite.equals("false")){
             ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
@@ -105,4 +86,6 @@ public class DetailActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //back arrow
     }
+
+
 }
