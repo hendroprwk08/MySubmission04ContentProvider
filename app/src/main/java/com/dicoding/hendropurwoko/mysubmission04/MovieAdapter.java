@@ -80,7 +80,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
                 bundle.putString("release_date", movieModels.get(position).getRelease_date().toString().trim());
                 bundle.putString("popularity", movieModels.get(position).getPopularity().toString().trim());
                 bundle.putString("poster", movieModels.get(position).getPoster().toString().trim());
-                bundle.putString("favorite", String.valueOf(MainActivity.stFavorite));
+                //bundle.putString("favorite", String.valueOf(MainActivity.stFavorite));
 
                 Intent detailIntent = new Intent(v.getContext(), DetailActivity.class);
                 detailIntent.putExtras(bundle);

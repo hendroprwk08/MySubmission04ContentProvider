@@ -58,9 +58,9 @@ public class MovieHelper {
         Log.d("Info ", movieModel.getTitle() + " " + movieModel.getFavorite());
 
         SQLiteStatement stmt = database.compileStatement(sql);
-        stmt.bindString(1, movieModel.getTitle());
+        stmt.bindString(1, movieModel.getTitle().replaceAll("'", "\\'"));
         stmt.bindString(2, movieModel.getRelease_date());
-        stmt.bindString(3, movieModel.getOverview());
+        stmt.bindString(3, movieModel.getOverview().replaceAll("'", "\\'"));
         stmt.bindString(4, movieModel.getPopularity());
         stmt.bindString(5, movieModel.getPoster());
         stmt.execute();
@@ -98,7 +98,23 @@ public class MovieHelper {
     }
 
     public int delete(int id){
-        return database.delete(MovieContract.TABLE_MOVIE, _ID + " = '"+id+"'", null);
+        return database.delete(MovieContract.TABLE_MOVIE, _ID + " = "+id, null);
+    }
+
+    public int deleteByTitle(String title){
+        return database.delete(MovieContract.TABLE_MOVIE, MovieContract.MovieColumns.TITLE + " = '" + title +"'", null);
+    }
+
+    public boolean CheckIsDataAlreadyInDBorNot(String fieldValue) {
+        fieldValue = fieldValue.replace("'", "\'");
+        String Query = "Select * from " + MovieContract.TABLE_MOVIE + " where " + MovieContract.MovieColumns.TITLE + " = '" + fieldValue +"'";
+        Cursor cursor = database.rawQuery(Query, null);
+        if(cursor.getCount() <= 0){
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
     }
 
     /* CONTENT PROVIDER */

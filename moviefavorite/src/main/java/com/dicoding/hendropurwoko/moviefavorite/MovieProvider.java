@@ -41,11 +41,6 @@ public class MovieProvider extends ContentProvider{
         return true;
     }
 
-    /*
-    Method query digunakan ketika ingin menjalankan query Select
-    Return cursor
-     */
-
     @Override
     public Cursor query(@NonNull Uri uri, String[] strings, String s, String[] strings1, String s1) {
         Cursor cursor;

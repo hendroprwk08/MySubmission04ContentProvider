@@ -24,6 +24,8 @@ public class DetailActivity extends AppCompatActivity {
     ImageView ivPoster;
     ImageButton ibFavorite;
     Bundle bundle;
+    boolean exists;
+
     String id, title, overview, releaseDate, popularity, favorite, poster, stFavorite;
     public static int RESULT_CODE = 110;
     Context c;
@@ -66,7 +68,7 @@ public class DetailActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"Favorite: "+ title, Toast.LENGTH_SHORT ).show();
                 }else{
                     ibFavorite.setImageResource(R.drawable.ic_favorite_off_black);
-                    movieHelper.delete(Integer.parseInt(id));
+                    movieHelper.deleteByTitle(title);
                     Toast.makeText(getApplicationContext(),"Dihapus: "+ title, Toast.LENGTH_SHORT ).show();
                 }
 
@@ -79,16 +81,23 @@ public class DetailActivity extends AppCompatActivity {
             }
         });
 
+        //cek if exist
         bundle = new Bundle();
         bundle = getIntent().getExtras();
 
         id = bundle.getString("id").toString();
-        title = bundle.getString("title").toString();
+        title = bundle.getString("title").toString() ;
         overview = bundle.getString("overview").toString();
         releaseDate = bundle.getString("release_date").toString();
         popularity = bundle.getString("popularity").toString();
         poster = bundle.getString("poster").toString();
-        favorite = bundle.getString("favorite").toString();
+
+        MovieHelper movieHelper = new MovieHelper(getApplicationContext());
+        movieHelper.open();
+        exists = movieHelper.CheckIsDataAlreadyInDBorNot(title);
+        movieHelper.close();
+
+        favorite = String.valueOf(exists);
 
         Log.d("Favorite: ", favorite);
 

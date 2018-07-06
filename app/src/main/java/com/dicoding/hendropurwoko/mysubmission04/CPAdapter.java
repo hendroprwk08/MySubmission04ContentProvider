@@ -49,29 +49,11 @@ public class CPAdapter extends RecyclerView.Adapter<CPAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(CPAdapter.ViewHolder holder, final int position) {
-        /*
-        Log.d ("Info ", movieModels.get(position).getTitle() + " " +
-                movieModels.get(position).getRelease_date()+ " " +
-                movieModels.get(position).getOverview()+ " " +
-                movieModels.get(position).getPopularity()+ " " +
-                movieModels.get(position).getPoster());
-
-         Log.d ("Info ", movieModel.getTitle() + " " +
-                movieModel.getRelease_date()+ " " +
-                movieModel.getOverview()+ " " +
-                movieModel.getPopularity()+ " " +
-                movieModel.getPoster());
-        */
-
         final MovieModel movieModel = getItem(position);
-
-
-
 
         holder.tvTitle.setText(movieModel.getTitle());
         holder.tvOverview.setText(movieModel.getOverview());
         holder.tvReleaseDate.setText(movieModel.getRelease_date());
-        //holder.tvFavorite.setText(String.valueOf(MainActivity.stFavorite));
 
         Glide.with(c)
                 .load(movieModel.getPoster())

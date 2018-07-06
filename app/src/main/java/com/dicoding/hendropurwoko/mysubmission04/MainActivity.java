@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //defauit check navigation
         nView = (NavigationView) findViewById(R.id.nav_view);
         nView.getMenu().getItem(0).setChecked(true);
         getSupportActionBar().setSubtitle("Home");
@@ -147,21 +146,23 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_now_playing) {
             stFavorite = false;
-            getSupportActionBar().setSubtitle("Home");
+            getSupportActionBar().setSubtitle("Now Playing");
 
             URL = "https://api.themoviedb.org/3/movie/now_playing?api_key="+ API + "&language=en-US";
             new LoadMoviesData().execute();
             displayJSONRecyclerView();
 
-            //sharedPreferences = getApplicationContext().getSharedPreferences("operation", Context.MODE_PRIVATE); //1
-            //editor = sharedPreferences.edit(); //2
-            //editor.putString("search_key", ""); //3
-            //editor.apply(); //4
+        } else if (id == R.id.nav_upcoming ) {
+            stFavorite = false;
+            getSupportActionBar().setSubtitle("Upcoming");
+
+            URL = "https://api.themoviedb.org/3/movie/upcoming?api_key="+ API + "&language=en-US";
+            new LoadMoviesData().execute();
+            displayJSONRecyclerView();
         } else if (id == R.id.nav_favorite) {
             getSupportActionBar().setSubtitle("Favorite");
             stFavorite = true;
