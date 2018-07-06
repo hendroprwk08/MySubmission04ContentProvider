@@ -7,7 +7,7 @@
         <item
             android:id="@+id/nav_now_playing"
             android:icon="@drawable/ic_play_black"
-            android:title="Home" />
+            android:title="Now Playing" />
 
         <item
             android:id="@+id/nav_upcoming"
