@@ -96,8 +96,8 @@ public class CPAdapter extends RecyclerView.Adapter<CPAdapter.ViewHolder> {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 intent.putExtra(Intent.EXTRA_TEXT, context.getResources().getString(R.string.app_name));
-                intent.putExtra(Intent.EXTRA_SUBJECT, movieModels.get(position).getTitle().toString().trim());
-                intent.putExtra(Intent.EXTRA_TEXT, movieModels.get(position).getTitle().toString().trim() + "\n\n" + movieModels.get(position).getOverview().toString().trim());
+                intent.putExtra(Intent.EXTRA_SUBJECT, movieModel.getTitle().toString().trim());
+                intent.putExtra(Intent.EXTRA_TEXT, movieModel.getTitle().toString().trim() + "\n\n" + movieModel.getOverview().toString().trim());
                 v.getContext().startActivity(Intent.createChooser(intent, context.getResources().getString(R.string.share)));
             }
         });
