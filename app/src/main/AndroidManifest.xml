@@ -4,9 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <permission
-        android:name="com.dicoding.hendropurwoko.mysubmission04.READ_DATABASE"
-        />
+    <permission android:name="com.dicoding.hendropurwoko.mysubmission04.READ_DATABASE" />
     <permission
         android:name="com.dicoding.hendropurwoko.mysubmission04.WRITE_DATABASE"
         android:protectionLevel="normal" />
@@ -20,19 +18,20 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
+            android:configChanges="keyboardHidden|orientation"
             android:label="@string/title_activity_main"
-            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailActivity"
-            android:screenOrientation="portrait"
-            android:configChanges="keyboardHidden|orientation"/>
+        <activity
+            android:name=".DetailActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name=".MovieProvider"
@@ -44,8 +43,24 @@
         <activity android:name=".TestCPActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".MainActivity" />
         </activity>
+
+        <receiver android:name=".MovieAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/movie_app_widget_info" />
+        </receiver>
+
+        <service
+            android:name=".StackWidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
     </application>
 
 </manifest>
